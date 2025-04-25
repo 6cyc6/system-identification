@@ -1,0 +1,13 @@
+Data include:
+
+1. Bag files: raw data recorded from ROS
+Striking motions with joint-torque PD controller: "2022-07-02-17-36-10.bag";
+Periodic trajectories with position controller: "2022-05-17-16-54-04.bag", "2022-05-17-17-51-32.bag" and "traj_1.bag" to "traj_24.bag"
+Periodic trajectories with joint-torque PD controller: "pd_tau_traj_1.bag" to "pd_tau_traj_24.bag"
+
+2. PKL: preprocessed data, including filtering for position and torques
+dset_3trajs.pkl: include 3 trajectories extracted from the bag files named
+"2022-07-02-17-36-10.bag", "2022-05-17-16-54-04.bag", "2022-05-17-17-51-32.bag"
+dset_27traj.pkl: include 27 trajectories from the bag files named
+"2022-07-02-17-36-10.bag", "2022-05-17-16-54-04.bag", "2022-05-17-17-51-32.bag", "traj_1.bag" to "traj_24.bag"
+

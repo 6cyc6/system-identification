@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<robot name="threeseg">
+  <link name="base" />
+  <link name="link1">
+    <inertial>
+      <mass value="0.5"/>
+      <origin rpy="0 0 0" xyz="0.000285 0.058872 0.041961"/>
+      <inertia ixx="3.0495e-02" ixy="-3.2800e-05" ixz="2.2370e-05" iyy="1.0969e-02" iyz="4.8615e-03" izz="3.0330e-02"/>
+    </inertial>
+    <visual>
+        <origin xyz="0 0 1.5" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.1 0.1 3"/>
+        </geometry>
+    </visual>
+  </link>
+  <link name="link2">
+    <inertial>
+      <mass value="1.0"/>
+      <origin rpy="0 0 0" xyz="0.000002 0.029546 0.126448"/>
+      <inertia ixx="3.1546e-02" ixy="-3.6628e-07" ixz="-3.9154e-07" iyy="2.9954e-02" iyz="-6.1227e-03" izz="9.5594e-03"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 1" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 2"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="link3">
+    <inertial>
+      <mass value="5."/>
+      <origin rpy="0 0 0" xyz="-0.000000 0.067480 0.034254"/>
+      <inertia ixx="2.5087e-02" ixy="-4.3896e-08" ixz="-1.3169e-07" iyy="8.9416e-03" iyz="4.1448e-03" izz="2.3916e-02"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 1.5" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 3"/>
+      </geometry>
+    </visual>
+  </link>
+  <link name="tool"></link>
+
+  <joint name="joint1" type="revolute">
+    <parent link="base" />
+    <child link="link1" />
+    <limit effort="30" velocity="1.0" lower="-1.570795" upper="1.570795" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+  </joint>
+  <joint name="joint2" type="revolute">
+    <parent link="link1" />
+    <child link="link2" />
+    <limit effort="30" velocity="1.0" lower="-1.570795" upper="1.570795" />
+    <origin xyz="0 0 3" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+  <joint name="joint3" type="revolute">
+    <parent link="link2" />
+    <child link="link3" />
+    <limit effort="30" velocity="1.0" lower="-1.570795" upper="1.570795" />
+    <origin xyz="0 0 2" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+  </joint>
+  <joint name="ee" type="fixed">
+    <parent link="link3" />
+    <child link="tool" />
+    <limit effort="30" velocity="1.0" lower="-6.28318" upper="6.28318" />
+    <origin xyz="0 0 1" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+  </joint>
+</robot>

@@ -1,0 +1,405 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<robot name="iiwa">
+  <link name="world">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 -0.0 0.0"/>
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+  </link>
+  <link name="F_link_0">
+    <inertial>
+      <origin xyz="-0.1 0.0 0.07" rpy="0.0 0.0 0.0"/>
+      <mass value="5.0"/>
+      <inertia ixx="0.05" ixy="0.0" ixz="0.0" iyy="0.06" iyz="0.0" izz="0.03"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_0.stl"/>
+      </geometry>
+      <material name="Grey"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_0.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_1">
+    <inertial>
+      <origin xyz="4e-06 -0.03379 0.122349" rpy="0.0 0.0 0.0"/>
+      <mass value="3.0"/>
+      <inertia ixx="0.032869" ixy="-4.3e-07" ixz="9.4e-07" iyy="0.033168" iyz="0.004897" izz="0.012274"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_1.stl"/>
+      </geometry>
+      <material name="Orange"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_1.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_2">
+    <inertial>
+      <origin xyz="0.000285 0.058872 0.041961" rpy="0.0 0.0 0.0"/>
+      <mass value="3.943457"/>
+      <inertia ixx="0.030495" ixy="-3.28e-05" ixz="2.237e-05" iyy="0.010969" iyz="0.0048615" izz="0.03033"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_2.stl"/>
+      </geometry>
+      <material name="Orange"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_2.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_3">
+    <inertial>
+      <origin xyz="2e-06 0.029546 0.126448" rpy="0.0 0.0 0.0"/>
+      <mass value="4.0"/>
+      <inertia ixx="0.031546" ixy="-3.6628e-07" ixz="-3.9154e-07" iyy="0.029954" iyz="-0.0061227" izz="0.0095594"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_3.stl"/>
+      </geometry>
+      <material name="Orange"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_3.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_4">
+    <inertial>
+      <origin xyz="-0.0 0.06748 0.034254" rpy="0.0 0.0 0.0"/>
+      <mass value="4.0"/>
+      <inertia ixx="0.025087" ixy="-4.3896e-08" ixz="-1.3169e-07" iyy="0.0089416" iyz="0.0041448" izz="0.023916"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_4.stl"/>
+      </geometry>
+      <material name="Orange"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_4.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_5">
+    <inertial>
+      <origin xyz="0.000125 0.021388 0.075417" rpy="0.0 0.0 0.0"/>
+      <mass value="3.2"/>
+      <inertia ixx="0.019009" ixy="3.3348e-06" ixz="2.9559e-06" iyy="0.016414" iyz="-0.0058267" izz="0.0084231"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_5.stl"/>
+      </geometry>
+      <material name="Orange"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_5.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_6">
+    <inertial>
+      <origin xyz="-0.0 0.002431 -0.00127" rpy="0.0 0.0 0.0"/>
+      <mass value="2.2"/>
+      <inertia ixx="0.0061583" ixy="3.4928e-08" ixz="-1.9792e-07" iyy="0.0044451" iyz="0.00032555" izz="0.0057995"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_6.stl"/>
+      </geometry>
+      <material name="Orange"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_6.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_7">
+    <inertial>
+      <origin xyz="0.00054 0.000569 0.026582" rpy="0.0 0.0 0.0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.00035211" ixy="-1.479e-07" ixz="4.7514e-06" iyy="0.00035066" iyz="-7.8574e-07" izz="0.00043803"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="../meshes/visual/link_7.stl"/>
+      </geometry>
+      <material name="Grey"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="../meshes/collision/link_7.stl"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </collision>
+  </link>
+  <link name="F_link_ee">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+  <joint name="world_F_base_joint" type="fixed">
+    <parent link="world"/>
+    <child link="F_link_0"/>
+    <axis xyz="1. 0. 0."/>
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <joint name="F_joint_1" type="revolute">
+    <dynamics damping="0.261257" friction="0.373279"/>
+    <limit effort="320.0" velocity="1.4835298641951802" lower="-2.9670597283903604" upper="2.9670597283903604"/>
+    <safety_controller k_velocity="10.0" k_position="100.0" soft_lower_limit="-2.9321531433504737" soft_upper_limit="2.9321531433504737"/>
+    <parent link="F_link_0"/>
+    <child link="F_link_1"/>
+    <axis xyz="0. 0. 1."/>
+    <origin xyz="0.0 0.0 0.1575" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <joint name="F_joint_2" type="revolute">
+    <dynamics damping="0.37328" friction="0.1813"/>
+    <limit effort="320.0" velocity="1.4835298641951802" lower="-2.0943951023931953" upper="2.0943951023931953"/>
+    <safety_controller k_velocity="10.0" k_position="100.0" soft_lower_limit="-2.0594885173533086" soft_upper_limit="2.0594885173533086"/>
+    <parent link="F_link_1"/>
+    <child link="F_link_2"/>
+    <axis xyz="0. 0. 1."/>
+    <origin xyz="0.0 0.0 0.2025" rpy="1.5707963267948966 0.0 3.141592653589793"/>
+  </joint>
+  <joint name="F_joint_3" type="revolute">
+    <dynamics damping="0.067733" friction="0.197613"/>
+    <limit effort="176.0" velocity="1.7453292519943295" lower="-2.9670597283903604" upper="2.9670597283903604"/>
+    <safety_controller k_velocity="10.0" k_position="100.0" soft_lower_limit="-2.9321531433504737" soft_upper_limit="2.9321531433504737"/>
+    <parent link="F_link_2"/>
+    <child link="F_link_3"/>
+    <axis xyz="0. 0. 1."/>
+    <origin xyz="0.0 0.2045 0.0" rpy="1.5707963267948966 0.0 3.141592653589793"/>
+  </joint>
+  <joint name="F_joint_4" type="revolute">
+    <dynamics damping="0.22195" friction="0.313484"/>
+    <limit effort="176.0" velocity="1.3089969389957472" lower="-2.0943951023931953" upper="2.0943951023931953"/>
+    <safety_controller k_velocity="10.0" k_position="100.0" soft_lower_limit="-2.0594885173533086" soft_upper_limit="2.0594885173533086"/>
+    <parent link="F_link_3"/>
+    <child link="F_link_4"/>
+    <axis xyz="0. 0. 1."/>
+    <origin xyz="0.0 0.0 0.2155" rpy="1.5707963267948966 0.0 0.0"/>
+  </joint>
+  <joint name="F_joint_5" type="revolute">
+    <dynamics damping="0.072873" friction="0.528149"/>
+    <limit effort="110.0" velocity="2.2689280275926285" lower="-2.9670597283903604" upper="2.9670597283903604"/>
+    <safety_controller k_velocity="10.0" k_position="100.0" soft_lower_limit="-2.9321531433504737" soft_upper_limit="2.9321531433504737"/>
+    <parent link="F_link_4"/>
+    <child link="F_link_5"/>
+    <axis xyz="0. 0. 1."/>
+    <origin xyz="0.0 0.1845 0.0" rpy="1.5707963267948968 1.2246467991473532e-16 -3.141592653589793"/>
+  </joint>
+  <joint name="F_joint_6" type="revolute">
+    <dynamics damping="0.008251" friction="0.211589"/>
+    <limit effort="40.0" velocity="2.356194490192345" lower="-2.0943951023931953" upper="2.0943951023931953"/>
+    <safety_controller k_velocity="10.0" k_position="100.0" soft_lower_limit="-2.0594885173533086" soft_upper_limit="2.0594885173533086"/>
+    <parent link="F_link_5"/>
+    <child link="F_link_6"/>
+    <axis xyz="0. 0. 1."/>
+    <origin xyz="0.0 0.0 0.2155" rpy="1.5707963267948966 0.0 0.0"/>
+  </joint>
+  <joint name="F_joint_7" type="revolute">
+    <dynamics damping="0.000999" friction="0.336998"/>
+    <limit effort="40.0" velocity="2.356194490192345" lower="-3.0543261909900763" upper="3.0543261909900763"/>
+    <safety_controller k_velocity="10.0" k_position="100.0" soft_lower_limit="-3.01941960595019" soft_upper_limit="3.01941960595019"/>
+    <parent link="F_link_6"/>
+    <child link="F_link_7"/>
+    <axis xyz="0. 0. 1."/>
+    <origin xyz="0.0 0.081 0.0" rpy="1.5707963267948968 1.2246467991473532e-16 -3.141592653589793"/>
+  </joint>
+  <joint name="F_joint_ee" type="fixed">
+    <parent link="F_link_7"/>
+    <child link="F_link_ee"/>
+    <axis xyz="1. 0. 0."/>
+    <origin xyz="0.0 0.0 0.07" rpy="0.0 0.0 0.0"/>
+  </joint>
+  <transmission name="F_tran_1">
+    <joint name="F_joint_1">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="F_motor_1">
+      <mechanicalReduction>1.0</mechanicalReduction>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </actuator>
+    <type>transmission_interface/SimpleTransmission</type>
+  </transmission>
+  <transmission name="F_tran_2">
+    <joint name="F_joint_2">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="F_motor_2">
+      <mechanicalReduction>1.0</mechanicalReduction>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </actuator>
+    <type>transmission_interface/SimpleTransmission</type>
+  </transmission>
+  <transmission name="F_tran_3">
+    <joint name="F_joint_3">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="F_motor_3">
+      <mechanicalReduction>1.0</mechanicalReduction>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </actuator>
+    <type>transmission_interface/SimpleTransmission</type>
+  </transmission>
+  <transmission name="F_tran_4">
+    <joint name="F_joint_4">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="F_motor_4">
+      <mechanicalReduction>1.0</mechanicalReduction>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </actuator>
+    <type>transmission_interface/SimpleTransmission</type>
+  </transmission>
+  <transmission name="F_tran_5">
+    <joint name="F_joint_5">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="F_motor_5">
+      <mechanicalReduction>1.0</mechanicalReduction>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </actuator>
+    <type>transmission_interface/SimpleTransmission</type>
+  </transmission>
+  <transmission name="F_tran_6">
+    <joint name="F_joint_6">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="F_motor_6">
+      <mechanicalReduction>1.0</mechanicalReduction>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </actuator>
+    <type>transmission_interface/SimpleTransmission</type>
+  </transmission>
+  <transmission name="F_tran_7">
+    <joint name="F_joint_7">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="F_motor_7">
+      <mechanicalReduction>1.0</mechanicalReduction>
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+    </actuator>
+    <type>transmission_interface/SimpleTransmission</type>
+  </transmission>
+  <material name="Black">
+    <color rgba="0. 0. 0. 1."/>
+  </material>
+  <material name="Blue">
+    <color rgba="0.  0.  0.8 1. "/>
+  </material>
+  <material name="Green">
+    <color rgba="0.  0.8 0.  1. "/>
+  </material>
+  <material name="Grey">
+    <color rgba="0.4 0.4 0.4 1. "/>
+  </material>
+  <material name="Orange">
+    <color rgba="1.         0.42352941 0.03921569 1.        "/>
+  </material>
+  <material name="Brown">
+    <color rgba="0.87058824 0.81176471 0.76470588 1.        "/>
+  </material>
+  <material name="Red">
+    <color rgba="0.8 0.  0.  1. "/>
+  </material>
+  <material name="White">
+    <color rgba="1. 1. 1. 1."/>
+  </material>
+  <material name="LightGrey">
+    <color rgba="0.3 0.3 0.3 1. "/>
+  </material>
+  <gazebo reference="F_link_0">
+    <material>Gazebo/Grey</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_link_1">
+    <material>Gazebo/Orange</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_link_2">
+    <material>Gazebo/Orange</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_link_3">
+    <material>Gazebo/Orange</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_link_4">
+    <material>Gazebo/Orange</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_link_5">
+    <material>Gazebo/Orange</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_link_6">
+    <material>Gazebo/Orange</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_link_7">
+    <material>Gazebo/Grey</material>
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <selfCollide>0</selfCollide>
+  </gazebo>
+  <gazebo reference="F_joint_ee">
+    <preserveFixedJoint>1</preserveFixedJoint>
+  </gazebo>
+  <gazebo>
+    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
+      <robotSimType>iiwas_gazebo/GravityCompensationHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+</robot>

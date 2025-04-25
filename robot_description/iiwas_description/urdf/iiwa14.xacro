@@ -1,0 +1,661 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find iiwas_description)/urdf/iiwa.gazebo.xacro" />
+  <!-- Import Transmissions -->
+  <xacro:include filename="$(find iiwas_description)/urdf/iiwa.transmission.xacro" />
+  <!-- Include Utilities -->
+  <xacro:include filename="$(find iiwas_description)/urdf/utilities.xacro" />
+
+  <!-- some parameters -->
+  <xacro:property name="safety" value="true"/>
+
+  <!-- some constants -->
+  <xacro:property name="safety_controller_k_pos" value="100" />
+  <xacro:property name="safety_controller_k_vel" value="80" />
+  <xacro:property name="safety_percentage" value="0.95"/>
+  <xacro:property name="joint_damping" value="0.5" />
+  <!-- joint limits -->
+  <xacro:property name="joint_limit_1" value="170"/>
+  <xacro:property name="joint_limit_2" value="120"/>
+  <xacro:property name="joint_limit_3" value="170"/>
+  <xacro:property name="joint_limit_4" value="120"/>
+  <xacro:property name="joint_limit_5" value="170"/>
+  <xacro:property name="joint_limit_6" value="120"/>
+  <xacro:property name="joint_limit_7" value="175"/>
+  <!-- max torques per joint -->
+  <xacro:property name="max_effort_1" value="320"/>
+  <xacro:property name="max_effort_2" value="320"/>
+  <xacro:property name="max_effort_3" value="176"/>
+  <xacro:property name="max_effort_4" value="176"/>
+  <xacro:property name="max_effort_5" value="110"/>
+  <xacro:property name="max_effort_6" value="40"/>
+  <xacro:property name="max_effort_7" value="40"/>
+  <!-- max velocities per joint -->
+  <xacro:property name="max_velocity_1" value="${85 * PI / 180.}"/>
+  <xacro:property name="max_velocity_2" value="${85 * PI / 180.}"/>
+  <xacro:property name="max_velocity_3" value="${100 * PI / 180.}"/>
+  <xacro:property name="max_velocity_4" value="${75 * PI/ 180.}"/>
+  <xacro:property name="max_velocity_5" value="${130 * PI / 180.}"/>
+  <xacro:property name="max_velocity_6" value="${135 * PI / 180.}"/>
+  <xacro:property name="max_velocity_7" value="${135 * PI / 180.}"/>
+  <xacro:property name="properties" value="${xacro.load_yaml('identified.yml')}"/>
+  
+
+  <xacro:macro name="iiwa14" params="parent hardware_interface robot_name dynamics_parameter *origin">
+
+    <!--joint between {parent} and link_0-->
+    <joint name="${parent}_${robot_name}_base_joint" type="fixed">
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${robot_name}_link_0"/>
+    </joint>
+
+    <link name="${robot_name}_link_0">
+      <inertial>
+        <!--  Fixed -->
+        <origin xyz="-0.0 0 0.0" rpy="0 0 0"/>
+        <mass value="5"/>
+        <inertia ixx="0.05"  ixy="0"  ixz="0" iyy="0.06" iyz="0" izz="0.03" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_0.stl"/>
+        </geometry>
+        <material name="Grey"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_0.stl"/>
+        </geometry>
+        <material name="Grey"/>
+      </collision>
+
+      <self_collision_checking>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <capsule radius="0.15" length="0.25"/>
+        </geometry>
+      </self_collision_checking>
+
+    </link>
+
+    <!-- joint between link_0 and link_1 -->
+    <joint name="${robot_name}_joint_1" type="revolute">
+      <parent link="${robot_name}_link_0"/>
+      <child link="${robot_name}_link_1"/>
+      <origin xyz="0 0 0.1575" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-joint_limit_1 * PI / 180}" upper="${joint_limit_1 * PI / 180}"
+             effort="${max_effort_1}" velocity="${max_velocity_1}" />
+      <xacro:safe_controller safety="${safety}"
+                             lower="${-safety_percentage * joint_limit_1 * PI / 180}"
+                             upper="${safety_percentage * joint_limit_1 * PI / 180}"
+                             k_p="${safety_controller_k_pos}"
+                             k_v="${safety_controller_k_vel}"/>
+
+      <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <dynamics damping="0.24150"  friction="0.31909"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'identified'}">
+        <!-- Identified -->
+        <dynamics damping="0.290458" friction="0.378214"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'epfl'}">
+        <!-- EPFL -->
+        <dynamics damping="${joint_damping}"/>
+      </xacro:if>
+    </joint>
+
+    <link name="${robot_name}_link_1">
+      <inertial>
+        <xacro:if value="${dynamics_parameter == 'eth'}">
+          <!-- ETH -->
+          <origin xyz="-0.003508 0.001602 -0.03139" rpy="0 0 0"/>
+          <mass value="3.947808"/>
+          <inertia ixx="0.004554"  ixy="0.00000"  ixz="-0.00000" iyy="0.00454" iyz="0.00001" izz="0.00029" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'cad'}">
+          <!-- CAD -->
+          <mass value="4.100238"/>
+          <origin xyz="0.000004 -0.033790 0.122349" rpy="0 0 0"/>
+          <inertia ixx="3.2869e-02" ixy="-4.3000e-07" iyy="3.3168e-02"
+                   ixz="9.4000e-07" iyz="4.8970e-03" izz="1.2274e-02"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'identified'}">
+          <!-- Identified Joint 1 -->
+          <mass value="${properties['link_1']['mass']}"/>
+          <origin xyz="${properties['link_1']['xyz'][0]} ${properties['link_1']['xyz'][1]} ${properties['link_1']['xyz'][2]}" rpy="0.0 0.0 0.0"/>
+          <inertia ixx="${properties['link_1']['ixx']}" ixy="${properties['link_1']['ixy']}" ixz="${properties['link_1']['ixz']}"
+                   iyy="${properties['link_1']['iyy']}" iyz="${properties['link_1']['iyz']}" izz="${properties['link_1']['izz']}"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'epfl'}">
+          <!-- EPFL -->
+          <origin xyz="0 -0.03 0.12" rpy="0 0 0"/>
+          <mass value="4"/>
+          <inertia ixx="0.1"  ixy="0"  ixz="0" iyy="0.09" iyz="0" izz="0.02" />
+        </xacro:if>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_1.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_1.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </collision>
+    </link>
+
+    <!-- joint between link_1 and link_2 -->
+    <joint name="${robot_name}_joint_2" type="revolute">
+      <parent link="${robot_name}_link_1"/>
+      <child link="${robot_name}_link_2"/>
+      <origin xyz="0 0 0.2025" rpy="${PI / 2}   0 ${PI}"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-joint_limit_2 * PI / 180}" upper="${joint_limit_2 * PI / 180}"
+             effort="${max_effort_2}" velocity="${max_velocity_2}" />
+      <xacro:safe_controller safety="${safety}"
+                             lower="${-safety_percentage * joint_limit_2 * PI / 180}"
+                             upper="${safety_percentage * joint_limit_2 * PI / 180}"
+                             k_p="${safety_controller_k_pos}"
+                             k_v="${safety_controller_k_vel}"/>
+      <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <dynamics damping="0.37328"  friction="0.18130"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'identified'}">
+        <!-- Identified -->
+        <dynamics damping="0.465142" friction="0.372973"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'epfl'}">
+        <!-- EPFL -->
+        <dynamics damping="${joint_damping}"/>
+      </xacro:if>
+    </joint>
+
+    <link name="${robot_name}_link_2">
+      <inertial>
+        <xacro:if value="${dynamics_parameter == 'eth'}">
+          <!-- ETH -->
+          <mass value="4.502752"/>
+          <origin xyz="-0.007671 0.166693  -0.003551" rpy="0 0 0"/>
+          <inertia ixx="0.00032"  ixy="0.00000"  ixz="0.000007" iyy="0.000100" iyz="-0.000003" izz="0.000419" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'cad'}">
+          <!-- CAD -->
+          <mass value="3.943457"/>
+          <origin xyz="0.000285 0.058872 0.041961" rpy="0 0 0"/>
+          <inertia ixx="3.0495e-02" ixy="-3.2800e-05" iyy="1.0969e-02"
+                   ixz="2.2370e-05" iyz="4.8615e-03" izz="3.0330e-02"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'identified'}">
+          <!-- Identified Joint 2 -->
+          <mass value="${properties['link_2']['mass']}"/>
+          <origin xyz="${properties['link_2']['xyz'][0]} ${properties['link_2']['xyz'][1]} ${properties['link_2']['xyz'][2]}" rpy="0.0 0.0 0.0"/>
+          <inertia ixx="${properties['link_2']['ixx']}" ixy="${properties['link_2']['ixy']}" ixz="${properties['link_2']['ixz']}"
+                   iyy="${properties['link_2']['iyy']}" iyz="${properties['link_2']['iyz']}" izz="${properties['link_2']['izz']}"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'epfl'}">
+          <!-- EPFL -->
+          <origin xyz="0.0003 0.059 0.042" rpy="0 0 0"/>
+          <mass value="4"/>
+          <inertia ixx="0.05"  ixy="0"  ixz="0" iyy="0.018" iyz="0" izz="0.044" />
+        </xacro:if>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_2.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_2.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </collision>
+    </link>
+
+    <!-- joint between link_2 and link_3 -->
+    <joint name="${robot_name}_joint_3" type="revolute">
+      <parent link="${robot_name}_link_2"/>
+      <child link="${robot_name}_link_3"/>
+      <origin xyz="0 0.2045 0" rpy="${PI / 2} 0 ${PI}"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-joint_limit_3 * PI / 180}" upper="${joint_limit_3 * PI / 180}"
+             effort="${max_effort_3}" velocity="${max_velocity_3}" />
+      <xacro:safe_controller safety="${safety}"
+                             lower="${-safety_percentage * joint_limit_3 * PI / 180}"
+                             upper="${safety_percentage * joint_limit_3 * PI / 180}"
+                             k_p="${safety_controller_k_pos}"
+                             k_v="${safety_controller_k_vel}"/>
+      <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <dynamics damping="0.11025"  friction="0.07302"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'identified'}">
+        <!-- Identified -->
+        <dynamics damping="0.1" friction="0.213255"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'epfl'}">
+        <!-- EPFL -->
+        <dynamics damping="${joint_damping}"/>
+      </xacro:if>
+    </joint>
+
+    <link name="${robot_name}_link_3">
+      <inertial>
+        <xacro:if value="${dynamics_parameter == 'eth'}">
+          <!-- ETH -->
+          <mass value="2.455197"/>
+          <origin xyz="-0.002246 -0.034918 -0.02652" rpy="0 0 0"/>
+          <inertia ixx="0.002233"  ixy="-0.000046"  ixz="0.000068" iyy="0.002191" iyz="0.000072" izz="0.000725" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'cad'}">
+          <!-- CAD -->
+          <mass value="4"/>
+          <origin xyz="0.000002 0.029546 0.126448" rpy="0 0 0"/>
+          <inertia ixx="3.1546e-02" ixy="-3.6628e-07" iyy="2.9954e-02"
+                   ixz="-3.9154e-07" iyz="-6.1227e-03" izz="9.5594e-03"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'identified'}">
+          <!-- Identified Joint 3 -->
+          <mass value="${properties['link_3']['mass']}"/>
+          <origin xyz="${properties['link_3']['xyz'][0]} ${properties['link_3']['xyz'][1]} ${properties['link_3']['xyz'][2]}" rpy="0.0 0.0 0.0"/>
+          <inertia ixx="${properties['link_3']['ixx']}" ixy="${properties['link_3']['ixy']}" ixz="${properties['link_3']['ixz']}"
+                   iyy="${properties['link_3']['iyy']}" iyz="${properties['link_3']['iyz']}" izz="${properties['link_3']['izz']}"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'epfl'}">
+          <!-- EPFL -->
+          <origin xyz="0 0.03 0.13" rpy="0 0 0"/>
+          <mass value="3"/>
+          <inertia ixx="0.08"  ixy="0"  ixz="0" iyy="0.075" iyz="0" izz="0.01" />
+        </xacro:if>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_3.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_3.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </collision>
+    </link>
+
+    <!-- joint between link_3 and link_4 -->
+    <joint name="${robot_name}_joint_4" type="revolute">
+      <parent link="${robot_name}_link_3"/>
+      <child link="${robot_name}_link_4"/>
+      <origin xyz="0 0 0.2155" rpy="${PI / 2} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-joint_limit_4 * PI / 180}" upper="${joint_limit_4 * PI / 180}"
+             effort="${max_effort_4}" velocity="${max_velocity_4}" />
+      <xacro:safe_controller safety="${safety}"
+                             lower="${-safety_percentage * joint_limit_4 * PI / 180}"
+                             upper="${safety_percentage * joint_limit_4 * PI / 180}"
+                             k_p="${safety_controller_k_pos}"
+                             k_v="${safety_controller_k_vel}"/>
+      <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <dynamics damping="0.10000"  friction="0.17671"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'identified'}">
+        <!-- Identified -->
+		<dynamics damping="0.170443" friction="0.327965"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'epfl'}">
+        <!-- EPFL -->
+        <dynamics damping="${joint_damping}"/>
+      </xacro:if>
+    </joint>
+
+    <link name="${robot_name}_link_4">
+      <inertial>
+        <xacro:if value="${dynamics_parameter == 'eth'}">
+          <!-- ETH -->
+          <mass value="2.611550"/>
+          <origin xyz="0.000196 -0.052679 0.038182" rpy="0 0 0"/>
+          <inertia ixx="0.038444"  ixy="0.000880"  ixz="-0.001120" iyy="0.011437" iyz="-0.001113" izz=" 0.049880" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'cad'}">
+          <!-- CAD -->
+          <mass value="4"/>
+          <origin xyz="-0.000000 0.067480 0.034254" rpy="0 0 0"/>
+          <inertia ixx="2.5087e-02" ixy="-4.3896e-08" iyy="8.9416e-03"
+                 ixz="-1.3169e-07" iyz="4.1448e-03" izz="2.3916e-02" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'identified'}">
+          <!-- Identified Joint 4 -->
+          <mass value="${properties['link_4']['mass']}"/>
+          <origin xyz="${properties['link_4']['xyz'][0]} ${properties['link_4']['xyz'][1]} ${properties['link_4']['xyz'][2]}" rpy="0.0 0.0 0.0"/>
+          <inertia ixx="${properties['link_4']['ixx']}" ixy="${properties['link_4']['ixy']}" ixz="${properties['link_4']['ixz']}"
+                   iyy="${properties['link_4']['iyy']}" iyz="${properties['link_4']['iyz']}" izz="${properties['link_4']['izz']}"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'epfl'}">
+          <!-- EPFL -->
+          <origin xyz="0 0.067 0.034" rpy="0 0 0"/>
+          <mass value="2.7"/>
+          <inertia ixx="0.03"  ixy="0"  ixz="0" iyy="0.01" iyz="0" izz="0.029" />
+        </xacro:if>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_4.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_4.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </collision>
+    </link>
+
+    <!-- joint between link_4 and link_5 -->
+    <joint name="${robot_name}_joint_5" type="revolute">
+      <parent link="${robot_name}_link_4"/>
+      <child link="${robot_name}_link_5"/>
+      <origin xyz="0 0.1845 0" rpy="${-PI / 2} ${PI} 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-joint_limit_5 * PI / 180}" upper="${joint_limit_5 * PI / 180}"
+             effort="${max_effort_5}" velocity="${max_velocity_5}" />
+      <xacro:safe_controller safety="${safety}"
+                             lower="${-safety_percentage * joint_limit_5 * PI / 180}"
+                             upper="${safety_percentage * joint_limit_5 * PI / 180}"
+                             k_p="${safety_controller_k_pos}"
+                             k_v="${safety_controller_k_vel}"/>
+      <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <dynamics damping="0.10000"  friction="0.03463"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'identified'}">
+        <!-- Identified -->
+        <dynamics damping="0.1" friction="0.536120"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'epfl'}">
+        <!-- EPFL -->
+        <dynamics damping="${joint_damping}"/>
+      </xacro:if>
+    </joint>
+
+    <link name="${robot_name}_link_5">
+      <inertial>
+        <xacro:if value="${dynamics_parameter == 'eth'}">
+          <!-- ETH -->
+          <mass value="3.410009"/>
+          <origin xyz="0.000054  -0.002367 -0.21134" rpy="0 0 0"/>
+          <inertia ixx="0.002769"  ixy="-0.000008"  ixz="0.000006" iyy="0.002842" iyz="-0.000001" izz="0.000117" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'cad'}">
+          <!-- CAD -->
+          <mass value="3.2"/>
+          <origin xyz="0.000125 0.021388 0.075417" rpy="0 0 0"/>
+          <inertia ixx="1.9009e-02" ixy="3.3348e-06" iyy="1.6414e-02"
+                   ixz="2.9559e-06" iyz="-5.8267e-03" izz="8.4231e-03" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'identified'}">
+          <!-- Identified Joint 5 -->
+          <mass value="${properties['link_5']['mass']}"/>
+          <origin xyz="${properties['link_5']['xyz'][0]} ${properties['link_5']['xyz'][1]} ${properties['link_5']['xyz'][2]}" rpy="0.0 0.0 0.0"/>
+          <inertia ixx="${properties['link_5']['ixx']}" ixy="${properties['link_5']['ixy']}" ixz="${properties['link_5']['ixz']}"
+                   iyy="${properties['link_5']['iyy']}" iyz="${properties['link_5']['iyz']}" izz="${properties['link_5']['izz']}"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'epfl'}">
+          <!-- EPFL -->
+          <origin xyz="0.0001 0.021 0.076" rpy="0 0 0"/>
+          <mass value="1.7"/>
+          <inertia ixx="0.02"  ixy="0"  ixz="0" iyy="0.018" iyz="0" izz="0.005" />
+        </xacro:if>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_5.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_5.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </collision>
+    </link>
+
+    <!-- joint between link_5 and link_6 -->
+    <joint name="${robot_name}_joint_6" type="revolute">
+      <parent link="${robot_name}_link_5"/>
+      <child link="${robot_name}_link_6"/>
+      <origin xyz="0 0 0.2155" rpy="${PI / 2} 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-joint_limit_6 * PI / 180}" upper="${joint_limit_6 * PI / 180}"
+             effort="${max_effort_6}" velocity="${max_velocity_6}" />
+      <xacro:safe_controller safety="${safety}"
+                             lower="${-safety_percentage * joint_limit_6 * PI / 180}"
+                             upper="${safety_percentage * joint_limit_6 * PI / 180}"
+                             k_p="${safety_controller_k_pos}"
+                             k_v="${safety_controller_k_vel}"/>
+      <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <dynamics damping="0.12484"  friction="0.13391"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'identified'}">
+        <!-- Identified -->
+		<dynamics damping="0.1" friction="0.212718"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'epfl'}">
+        <!-- EPFL -->
+        <dynamics damping="${joint_damping}"/>
+      </xacro:if>
+    </joint>
+
+    <link name="${robot_name}_link_6">
+      <inertial>
+        <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <mass value="3.387949"/>
+        <origin xyz="0.000492  0.020190  -0.027496" rpy="0 0 0"/>
+        <inertia ixx="0.000500"  ixy="-0.000050"  ixz="-0.000024" iyy="0.002809" iyz="-0.000041" izz="0.002315" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'cad'}">
+          <!-- CAD -->
+          <mass value="2.2"/>
+          <origin xyz="-0.000000 0.002431 -0.001270" rpy="0 0 0"/>
+          <inertia ixx="6.1583e-03" ixy="3.4928e-08" iyy="4.4451e-03"
+                   ixz="-1.9792e-07" iyz="3.2555e-04" izz="5.7995e-03" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'identified'}">
+          <!-- Identified Joint 6 -->
+          <mass value="${properties['link_6']['mass']}"/>
+          <origin xyz="${properties['link_6']['xyz'][0]} ${properties['link_6']['xyz'][1]} ${properties['link_6']['xyz'][2]}" rpy="0.0 0.0 0.0"/>
+          <inertia ixx="${properties['link_6']['ixx']}" ixy="${properties['link_6']['ixy']}" ixz="${properties['link_6']['ixz']}"
+                   iyy="${properties['link_6']['iyy']}" iyz="${properties['link_6']['iyz']}" izz="${properties['link_6']['izz']}"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'epfl'}">
+          <!-- EPFL -->
+          <origin xyz="0 0.0006 0.0004" rpy="0 0 0"/>
+          <mass value="1.8"/>
+          <inertia ixx="0.005"  ixy="0"  ixz="0" iyy="0.0036" iyz="0" izz="0.0047" />
+        </xacro:if>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_6.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_6.stl"/>
+        </geometry>
+        <material name="Orange"/>
+      </collision>
+    </link>
+
+    <!-- joint between link_6 and link_7 -->
+    <joint name="${robot_name}_joint_7" type="revolute">
+      <parent link="${robot_name}_link_6"/>
+      <child link="${robot_name}_link_7"/>
+      <origin xyz="0 0.081 0" rpy="${- PI / 2} ${PI} 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-joint_limit_7 * PI / 180}" upper="${joint_limit_7 * PI / 180}"
+             effort="${max_effort_7}" velocity="${max_velocity_7}" />
+      <xacro:safe_controller safety="${safety}"
+                             lower="${-safety_percentage * joint_limit_7 * PI / 180}"
+                             upper="${safety_percentage * joint_limit_7 * PI / 180}"
+                             k_p="${safety_controller_k_pos}"
+                             k_v="${safety_controller_k_vel}"/>
+      <xacro:if value="${dynamics_parameter == 'eth'}">
+        <!-- ETH -->
+        <dynamics damping="0.10000"  friction="0.08710"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'identified'}">
+        <!-- Identified -->
+		<dynamics damping="0.1" friction="0.337016"/>
+      </xacro:if>
+
+      <xacro:if value="${dynamics_parameter == 'epfl'}">
+        <!-- EPFL -->
+        <dynamics damping="${joint_damping}"/>
+      </xacro:if>
+    </joint>
+
+    <link name="${robot_name}_link_7">
+      <inertial>
+        <xacro:if value="${dynamics_parameter == 'eth'}">
+          <!-- ETH -->
+          <mass value="0.354321"/>
+          <origin xyz="-0.034656 -0.023242 0.07138" rpy="0 0 0"/>
+          <inertia ixx="0.007946"  ixy="0.000221"  ixz="-0.000294" iyy=" 0.010889" iyz="-0.000294" izz="0.002944" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'cad'}">
+          <!-- CAD -->
+          <mass value="0.4"/>
+          <origin xyz="0.000540 0.000569 0.026582" rpy="0 0 0"/>
+          <inertia ixx="3.5211e-04" ixy="-1.4790e-07" iyy="3.5066e-04"
+                   ixz="4.7514e-06" iyz="-7.8574e-07" izz="4.3803e-04" />
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'identified'}">
+          <!-- Identified Joint 7 -->
+          <mass value="${properties['link_7']['mass']}"/>
+          <origin xyz="${properties['link_7']['xyz'][0]} ${properties['link_7']['xyz'][1]} ${properties['link_7']['xyz'][2]}" rpy="0.0 0.0 0.0"/>
+          <inertia ixx="${properties['link_7']['ixx']}" ixy="${properties['link_7']['ixy']}" ixz="${properties['link_7']['ixz']}"
+                   iyy="${properties['link_7']['iyy']}" iyz="${properties['link_7']['iyz']}" izz="${properties['link_7']['izz']}"/>
+        </xacro:if>
+
+        <xacro:if value="${dynamics_parameter == 'epfl'}">
+          <!-- EPFL -->
+          <origin xyz="0 0 0.02" rpy="0 0 0"/>
+          <mass value="0.3"/>
+          <inertia ixx="0.001"  ixy="0"  ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+        </xacro:if>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/visual/link_7.stl"/>
+        </geometry>
+        <material name="Grey"/>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://iiwas_description/meshes/collision/link_7.stl"/>
+        </geometry>
+        <material name="Grey"/>
+      </collision>
+    </link>
+
+    <joint name="${robot_name}_joint_ee" type="fixed">
+      <parent link="${robot_name}_link_7"/>
+      <child link="${robot_name}_link_ee"/>
+      <origin xyz="0 0 0.07" rpy="0 0 0"/>
+    </joint>
+
+    <link name="${robot_name}_link_ee">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="1e-6"/>
+        <inertia ixx="0.001"  ixy="0"  ixz="0" iyy="0.001" iyz="0" izz="0.001" />
+      </inertial>
+    </link>
+
+    <!--Extensions -->
+    <xacro:iiwa_gazebo robot_name="${robot_name}" />
+    <xacro:iiwa_transmission robot_name="${robot_name}" hardware_interface="${hardware_interface}"/>
+
+  </xacro:macro>
+
+</robot>
