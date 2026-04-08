@@ -3,7 +3,7 @@ from system_identification.friction_model import *
 from system_identification.rotor_model import *
 from system_identification.inertia_model import *
 from loguru import logger
-from system_identification.utils import merge_dict, save_yaml
+from system_identification.my_utils import merge_dict, save_yaml
 
 class AbstractSolver(object):
     def __init__(self, models_config={}, solver_config={}):

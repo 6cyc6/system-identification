@@ -17,8 +17,7 @@ def params2cond(params, fourier_config, robot_config, sysID):
 
     t, qs, qds, qdds = obtain_fourier_traj(params, fourier_config, robot_config)
     regressor = sysID.regressor(qs, qds, qdds)
-    reduced_R, cond_num = QR_dim_reduction(regressor)
-    u, s, v = np.linalg.svd(reduced_R)
+    _, cond_num, s = QR_dim_reduction(regressor)
     logger.info(f"current singular value: {s}, condition number: {cond_num}")
     return cond_num
 
@@ -68,8 +67,7 @@ def params2condFriction(params, fourier_config, robot_config, sysID, friction_mo
     else:
         raise ValueError("Invalid friction model")
     regressor = np.hstack([regressor, regressorFriction])
-    reduced_R, cond_num = QR_dim_reduction(regressor)
-    u, s, v = np.linalg.svd(reduced_R)
+    _, cond_num, s = QR_dim_reduction(regressor)
     logger.info(f"current singular value: {s}, condition number: {cond_num}")
     return cond_num
 

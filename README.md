@@ -14,6 +14,12 @@ conda env create -f environment.yml
 ```
 pip install -e .
 ```
+
+# My setup
+```
+python -m pip install pin
+```
+
 ## Running experiments 
 ### Active the virtual environment: 
 ```

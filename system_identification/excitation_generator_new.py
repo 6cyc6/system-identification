@@ -34,12 +34,12 @@ def generate_constraints(order: int):
         cB: constraints matrix, B[1] = -np.dot(cB[0][2:], B[2:])
                                 B[0] = -np.dot(cB[1][1:], B[1:])
     """
-    cA = np.ones(order)
-    cB = np.array(
-        [[1 / i for i in range(1, order + 1)], [i for i in range(1, order + 1)]]
-    )
-    cB_reduced_echelon_form = np.array([(cB[0] - cB[1]) / (cB[0] - cB[1])[1], cB[1]])
-    return cA, cB_reduced_echelon_form
+    k    = np.arange(1, order + 1, dtype=float)
+    cA   = np.ones(order)
+    row0 = 1.0 / k   # [1/1, 1/2, ..., 1/L]
+    row1 = k         # [1,   2,   ...,  L]
+    diff = row0 - row1
+    return cA, np.array([diff / diff[1], row1])
 
 def generate_random_param(order: int, njoints: int):
     """
@@ -141,44 +141,29 @@ def generate_fourier_traj(
         init_pos = np.zeros(njoints)
     if init_vel is None:
         init_vel = np.zeros(njoints)
-    step_size = 1 / fps
 
     omega_f = 2 * np.pi / duration
-    num_samples = int(duration / step_size)
-    t = np.linspace(0, duration, num_samples+1)
-    q = np.zeros((t.shape[0], njoints)) + init_pos
-    dq = np.zeros_like(q) + init_vel
-    ddq = np.zeros_like(q)
-    A, B = params[0], params[1]
+    num_samples = int(duration * fps)
+    t = np.linspace(0, duration, num_samples + 1)
+    A, B = params[0], params[1]                # (order, njoints) each
 
-    # # the outer product of sin / cos and parameters will generate the trajectory as
-    # # [num_samples, njoints] shape
-    # for k in range(1, order + 1):
-    #     q += np.outer(np.sin(omega_f * k * t), A[k - 1] / (omega_f * k)) - np.outer(
-    #         np.cos(omega_f * k * t), B[k - 1] / (omega_f * k)
-    #     )
-    #     dq += np.outer(np.cos(omega_f * k * t), A[k - 1]) + np.outer(
-    #         np.sin(omega_f * k * t), B[k - 1]
-    #     )
-    #     ddq += -np.outer(np.sin(omega_f * k * t), A[k - 1] * (omega_f * k)) + np.outer(
-    #         np.cos(omega_f * k * t), B[k - 1] * (omega_f * k)
-    #     )
-    # return t, q, dq, ddq
-    
-    # Vectorized over all harmonics at once
-    # k: (order,), phases: (T, order)
-    k = np.arange(1, order + 1)
-    phases = np.outer(t, omega_f * k)          # (T, order)
-    sin_mat = np.sin(phases)                   # (T, order)
-    cos_mat = np.cos(phases)                    # (T, order)
+    omega_k = omega_f * np.arange(1, order + 1)   # (order,)
+    inv_ok  = 1.0 / omega_k                        # (order,)
 
-    inv_omega_k = 1.0 / (omega_f * k)          # (order,)
-    omega_k     = omega_f * k                   # (order,)
+    # Stack coefficient matrices so q, dq, ddq are all computed in 2 matmuls:
+    #   sin_mat @ sin_coeff + cos_mat @ cos_coeff → (T, 3*njoints)
+    # Columns [0:J]   → q increment
+    # Columns [J:2J]  → dq increment
+    # Columns [2J:3J] → ddq increment
+    sin_coeff = np.hstack([ A * inv_ok[:, None],  B,  -A * omega_k[:, None]])  # (order, 3J)
+    cos_coeff = np.hstack([-B * inv_ok[:, None],  A,   B * omega_k[:, None]])  # (order, 3J)
 
-    # A, B: (order, njoints) — scale rows by harmonic-dependent factors
-    q   += sin_mat @ (A * inv_omega_k[:, None]) - cos_mat @ (B * inv_omega_k[:, None])
-    dq  += cos_mat @ A                          + sin_mat @ B
-    ddq += -sin_mat @ (A * omega_k[:, None])   + cos_mat @ (B * omega_k[:, None])
+    phases = np.outer(t, omega_k)                          # (T, order)
+    result = np.sin(phases) @ sin_coeff + np.cos(phases) @ cos_coeff  # (T, 3J)
+
+    q   = result[:, :njoints]           + init_pos
+    dq  = result[:, njoints:2*njoints]  + init_vel
+    ddq = result[:, 2*njoints:]
     return t, q, dq, ddq
 
 
@@ -236,63 +221,27 @@ def is_traj_valid_jointwise(q, dq, ddq, robot_config, joint_id):
     return True
 
 def is_params_valid(params, fourier_config, robot_config):
+    """params: (2, order, njoints) as returned by generate_random_param"""
     order = fourier_config["order"]
     duration = fourier_config["duration"]
-    njoints = robot_config["njoints"]
-    upperPosLimit, lowerPosLimit, velLimit = (
-        robot_config["upper_joint_pos_limits"],
-        robot_config["lower_joint_pos_limits"],
-        robot_config["joint_vel_limits"],
-    )
-    upperPosLimit, lowerPosLimit, velLimit = (
-        np.array(upperPosLimit),
-        np.array(lowerPosLimit),
-        np.array(velLimit),
-    )
-    start_idx = len(params) // 2
-    # nonlinear constraints for positions and velocities
-    extreme_constraint_mat = np.zeros((njoints, order * njoints))
-    for i in range(njoints):
-        extreme_constraint_mat[i, i * order : (i + 1) * order] = np.ones(order)
+    upperPosLimit = np.array(robot_config["upper_joint_pos_limits"])
+    velLimit = np.minimum(np.array(robot_config["joint_vel_limits"]), 10000.0)
 
-    def extreme_vel_func(x):
-        A = x[:start_idx]
-        B = x[start_idx:]
-        A2 = A**2
-        B2 = B**2
-        A2B2 = A2 + B2
-        root_A2B2 = np.sqrt(A2B2)
-        return np.dot(extreme_constraint_mat, root_A2B2)
+    A, B = params[0], params[1]                        # (order, njoints)
+    root_A2B2 = np.sqrt(A**2 + B**2)                  # (order, njoints)
 
-    extreme_vel_lb = np.inf
-    extreme_vel_ub = velLimit
-    for i in range(len(extreme_vel_ub)):
-        if extreme_vel_ub[i] > 10000:
-            extreme_vel_ub[i] = 10000
-    extreme_vel_constraint_func = lambda x: -(extreme_vel_func(x) - extreme_vel_ub)
-    if np.any(extreme_vel_constraint_func(params) < 0):
+    # Velocity bound: sum_k sqrt(Ak_j^2 + Bk_j^2) per joint
+    if np.any(root_A2B2.sum(axis=0) > velLimit):
         print("VEL OUT OF BOUND")
         return False
 
+    # Position bound: sum_k sqrt(...)/k per joint
     omega_f = 2 * np.pi / duration
-
-    def extreme_pos_func(x):
-        A = x[:start_idx]
-        B = x[start_idx:]
-        A2 = A**2
-        B2 = B**2
-        A2B2 = A2 + B2
-        root_A2B2 = np.sqrt(A2B2)
-        divider = np.array([1 / i for i in range(1, order + 1)] * njoints)
-        root_A2B2_divided = root_A2B2 * divider
-        return np.dot(extreme_constraint_mat, root_A2B2_divided)
-
-    extreme_pos_lb = np.inf
-    extreme_pos_ub = upperPosLimit * omega_f
-    extreme_pos_constraint_func = lambda x: -(extreme_pos_func(x) - extreme_pos_ub)
-    if np.any(extreme_pos_constraint_func(params) < 0):
+    inv_k = 1.0 / np.arange(1, order + 1, dtype=float)  # (order,)
+    if np.any((root_A2B2 * inv_k[:, None]).sum(axis=0) > upperPosLimit * omega_f):
         print("POS OUT OF BOUND")
         return False
+
     return True
 
 
@@ -312,23 +261,26 @@ def obtain_valid_traj_param(fourier_config, robot_config):
     njoints = robot_config["njoints"]
     upper = np.array(robot_config["upper_joint_pos_limits"])
     lower = np.array(robot_config["lower_joint_pos_limits"])
-    vel_limit = np.array(robot_config["joint_vel_limits"])
-    
-    valid_traj = False
-    valid_param = False
-    no_collision = False
-    
-    while not valid_traj or not valid_param or not no_collision:
-        params = generate_random_param(order, njoints)
-        t, q, dq, ddq = obtain_fourier_traj(params, fourier_config, robot_config)
-        # valid_traj = is_traj_valid(q, dq, ddq, robot_config)
-        valid_traj = np.all(q <= upper) and np.all(q >= lower) and np.all(np.abs(dq) <= vel_limit)
-        no_collision, ee_pos = test_traj(q, dq, ddq)
 
-        _params = np.transpose(params, (0, 2, 1))
-        _params = _params.flatten()
-        valid_param = is_params_valid(_params, fourier_config, robot_config)
-    return t, q, dq, ddq, params
+    while True:
+        params = generate_random_param(order, njoints)
+
+        # Cheapest check first: analytical param bounds (no trajectory needed)
+        if not is_params_valid(params, fourier_config, robot_config):
+            continue
+
+        # Generate trajectory only once params pass the analytical check
+        t, q, dq, ddq = obtain_fourier_traj(params, fourier_config, robot_config)
+
+        # Position bounds: is_params_valid guarantees velocity and upper position
+        # (relative to init_pos); check absolute bounds on the actual trajectory.
+        if not (np.all(q <= upper) and np.all(q >= lower)):
+            continue
+
+        # Most expensive: FK-based collision check
+        no_collision, _ = test_traj(q, dq, ddq)
+        if no_collision:
+            return t, q, dq, ddq, params
 
 def obtain_valid_traj_param_jointwise(fourier_config, robot_config, joint_id=0):
     order = fourier_config["order"]
@@ -421,3 +373,4 @@ if __name__ == "__main__":
     else:
         np.save(f"../experiments/traj_data/init_params_{args.fourier_duration}.npy", init_dict, allow_pickle=True)
     plt.show()
+    

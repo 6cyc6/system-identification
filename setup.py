@@ -21,7 +21,8 @@ setup(
     author_email='huang@robot-learning.de',
     license='MIT',
     packages=[package for package in find_packages()
-              if package.startswith('system_identification')],
+              if package.startswith('system_identification')
+              or package.startswith('twinskill')],
     zip_safe=False,
     install_requires=requires_list,
     extras_require={},

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from loguru import logger
 from datetime import datetime
 from scipy.optimize import minimize
-from system_identification.excitation_generator import obtain_valid_traj_param, obtain_fourier_traj, is_traj_valid
+from system_identification.excitation_generator_new import obtain_valid_traj_param, obtain_fourier_traj, is_traj_valid
 from system_identification.excitation_optimization import params2cond, constraints, params2coverage, params2condFriction, generateSymFrictionReg, generateAsymFrictionReg
 from system_identification.inertia_model import InertiaModel
 from system_identification.my_utils.path_utils import safe_mkdir
@@ -120,14 +120,3 @@ if __name__ == "__main__":
         regressor = np.hstack((regressor, regressorFriction))
         reduced_R, cond_num, _ = QR_dim_reduction(regressor)
         logger.info(f"condition number: {cond_num}")
-
-    # save trajectories
-    if save:
-        _time = datetime.now().strftime("%d%m%Y%H%M%S")
-        _dir = f"./traj_data"
-        safe_mkdir(_dir)
-        np.save(
-            f"{_dir}/{args.excite_type}_{args.robot}_{_time}",
-            {"t": t, "q": qs, "dq": qds, "ddq": qdds},
-            allow_pickle=True
-        )

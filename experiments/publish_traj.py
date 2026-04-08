@@ -1,7 +1,7 @@
 import numpy as np
 import rospy
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from system_identification.utils import *
+from system_identification.my_utils import *
 
 def quadratic_coeff(theta_0, theta_f, tf=1):
     a0 = theta_0

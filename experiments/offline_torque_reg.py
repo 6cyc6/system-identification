@@ -1,5 +1,5 @@
 import numpy as np
-from system_identification.utils import *
+from system_identification.my_utils import *
 from system_identification.qp_solver import *
 from system_identification.overparam_solver import *
 from system_identification.inertia_model import InertiaModel

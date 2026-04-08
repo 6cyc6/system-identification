@@ -1,5 +1,5 @@
 import numpy as np
-from system_identification.utils import feature2regressor
+from system_identification.my_utils import feature2regressor
 
 class FrictionModel(object):
     def __init__(self, param, num_coefficient_per_joint=1):

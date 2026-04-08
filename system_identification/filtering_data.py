@@ -1,7 +1,7 @@
 import numpy as np
 import rosbag
 from scipy.signal import filtfilt, butter
-from system_identification.utils import *
+from system_identification.my_utils import *
 
 def read_bag(bag, lower_bd, vis_cutting=False, end_index=10000, mode="all"):
     # =================================================================

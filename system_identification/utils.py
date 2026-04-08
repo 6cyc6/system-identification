@@ -7,6 +7,7 @@ from copy import copy
 from loguru import logger
 from scipy.signal import savgol_filter
 from six.moves import cPickle as pickle  # for performance
+
 # ==============================================================================
 # Customize wandb class for data logger
 # ==============================================================================
@@ -366,7 +367,7 @@ def SVD_dim_reduction(A):
     logger.info(f"After dimension reduction, shape: {A_reduced.shape}, rank: {rank}")
     return A_reduced
 
-def QR_dim_reduction(A):
+def QR_dim_reduction_backup(A):
     """
     Perform Reduced QR decomposition, and remove the columns with small diagonal elements in R
     The resulted matrix has the same rank as the original matrix, the return include the reduced
@@ -379,16 +380,42 @@ def QR_dim_reduction(A):
     diag_r = abs(np.diagonal(r))
     cols = np.arange(N)
     f = lambda x: diag_r[x]
-    cols = sorted(cols, key=f)    
+    cols = sorted(cols, key=f)
     del_cols = cols[: N - rank]
     del_cols = sorted(del_cols)
-    
+
     r_reduced = copy(r)
     r_reduced = np.delete(r_reduced, del_cols, 1)
-    
+
     # compuate singular values of A
     cond = np.linalg.cond(r_reduced)
     return r_reduced, cond
+
+def QR_dim_reduction(A):
+    """
+    Perform Reduced QR decomposition, and remove the columns with small diagonal elements in R.
+    The resulted matrix has the same rank as the original matrix; returns the reduced R matrix
+    and the condition number of the reduced R matrix.
+
+    Avoids the double-SVD present in the backup version:
+      - rank is estimated from the diagonal of R (no SVD needed for triangular matrices)
+      - condition number is derived from the single SVD used to compute singular values
+    """
+    q, r = scipy.linalg.qr(A, mode='economic')
+    N = A.shape[1]
+
+    diag_r = np.abs(np.diagonal(r))
+    tol = diag_r.max() * max(r.shape) * np.finfo(r.dtype).eps
+    rank = int(np.sum(diag_r > tol))
+
+    cols = np.argsort(diag_r)          # ascending: smallest diagonal first
+    del_cols = np.sort(cols[: N - rank])
+
+    r_reduced = np.delete(r, del_cols, axis=1)
+
+    s = np.linalg.svd(r_reduced, compute_uv=False)
+    cond = s[0] / s[-1]
+    return r_reduced, cond, s
 
 def feature2regressor(list_of_features, n_datapoints, njoints):
     """
@@ -403,10 +430,11 @@ def feature2regressor(list_of_features, n_datapoints, njoints):
     ]
 
     # use identity matrix to filter out off-diagonal entries
-    identities_filter = []
-    for i in range(n_datapoints):
-        identities_filter.append(np.identity(njoints))
-    identities_filter = np.vstack(identities_filter)
+    # identities_filter = []
+    # for i in range(n_datapoints):
+    #     identities_filter.append(np.identity(njoints))
+    # identities_filter = np.vstack(identities_filter)
+    identities_filter = np.tile(np.eye(njoints), (n_datapoints, 1))
     list_of_regressor = [feature * identities_filter for feature in list_of_features]
     regressor = np.hstack(list_of_regressor)
     return regressor

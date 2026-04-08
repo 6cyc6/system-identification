@@ -1,4 +1,4 @@
-from system_identification.utils import *
+from system_identification.my_utils import *
 import rospy
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 import subprocess
