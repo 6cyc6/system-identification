@@ -303,6 +303,31 @@ def obtain_valid_traj_param_jointwise(fourier_config, robot_config, joint_id=0):
 _pin_model = None
 _pin_data = None
 
+_CAMERA_BOX_MARGIN_SCALE = 1.25
+_CAMERA_BOX_SPECS_MM = (
+    ("camera_1_pos_y", np.array([165.0, 340.0, 170.0]), np.array([170.0, 160.0, 340.0])),
+    ("camera_2_pos_y", np.array([870.0, 365.0, 180.0]), np.array([180.0, 110.0, 360.0])),
+    ("camera_1_neg_y", np.array([165.0, -340.0, 170.0]), np.array([170.0, 160.0, 340.0])),
+    ("camera_2_neg_y", np.array([870.0, -365.0, 180.0]), np.array([180.0, 110.0, 360.0])),
+)
+_CAMERA_SAFETY_BOXES_MM = tuple(
+    {
+        "name": name,
+        "center": center,
+        "size": size * _CAMERA_BOX_MARGIN_SCALE,
+    }
+    for name, center, size in _CAMERA_BOX_SPECS_MM
+)
+_CAMERA_SAFETY_BOXES_M = tuple(
+    {
+        "name": box["name"],
+        "center": box["center"] / 1000.0,
+        "half_size": box["size"] / 2000.0,
+    }
+    for box in _CAMERA_SAFETY_BOXES_MM
+)
+_LINK_COLLISION_SAMPLES = 7
+
 def _get_pin_model_data():
     global _pin_model, _pin_data
     if _pin_model is None:
@@ -310,6 +335,22 @@ def _get_pin_model_data():
         _pin_model = pin.buildModelFromUrdf(urdf_file)
         _pin_data = _pin_model.createData()
     return _pin_model, _pin_data
+
+
+def _point_inside_box(point, box):
+    return np.all(np.abs(point - box["center"]) <= box["half_size"])
+
+
+def _sample_robot_body_points(model, data):
+    joint_positions = [data.oMi[joint_id].translation.copy() for joint_id in range(1, model.njoints)]
+    if not joint_positions:
+        return []
+
+    points = [joint_positions[0]]
+    for start, end in zip(joint_positions[:-1], joint_positions[1:]):
+        for alpha in np.linspace(0.0, 1.0, _LINK_COLLISION_SAMPLES, endpoint=True)[1:]:
+            points.append((1.0 - alpha) * start + alpha * end)
+    return points
 
 
 def test_traj(q, dq, _ddq):
@@ -328,6 +369,32 @@ def test_traj(q, dq, _ddq):
 
         if ee_pos_i[0] < -0.5 or abs(ee_pos_i[1]) > 0.8 or ee_pos_i[2] < 0.2:
             return False, None
+
+        ee_pos.append(ee_pos_i)
+
+    return True, ee_pos
+
+
+def test_traj_collision(q, dq, _ddq):
+    model, data = _get_pin_model_data()
+
+    if np.any(np.abs(dq) > model.velocityLimit):
+        return False, None
+    if np.any(np.abs(q) > model.upperPositionLimit):
+        return False, None
+
+    ee_pos = []
+    for q_i in q:
+        pin.forwardKinematics(model, data, q_i)
+        pin.updateFramePlacements(model, data)
+        ee_pos_i = data.oMi[-1].translation.copy()
+
+        if ee_pos_i[0] < 0.0 or abs(ee_pos_i[1]) > 0.8 or ee_pos_i[2] < 0.2:
+            return False, None
+
+        for body_point in _sample_robot_body_points(model, data):
+            if any(_point_inside_box(body_point, box) for box in _CAMERA_SAFETY_BOXES_M):
+                return False, None
 
         ee_pos.append(ee_pos_i)
 
