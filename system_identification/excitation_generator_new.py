@@ -326,6 +326,8 @@ _CAMERA_SAFETY_BOXES_M = tuple(
     }
     for box in _CAMERA_SAFETY_BOXES_MM
 )
+_CAMERA_SAFETY_BOX_CENTERS_M = np.array([box["center"] for box in _CAMERA_SAFETY_BOXES_M])
+_CAMERA_SAFETY_BOX_HALF_SIZES_M = np.array([box["half_size"] for box in _CAMERA_SAFETY_BOXES_M])
 _LINK_COLLISION_SAMPLES = 7
 
 def _get_pin_model_data():
@@ -338,7 +340,7 @@ def _get_pin_model_data():
 
 
 def _point_inside_box(point, box):
-    return np.all(np.abs(point - box["center"]) <= box["half_size"])
+    return np.all(np.abs(point[:2] - box["center"][:2]) <= box["half_size"][:2])
 
 
 def _sample_robot_body_points(model, data):
@@ -351,6 +353,40 @@ def _sample_robot_body_points(model, data):
         for alpha in np.linspace(0.0, 1.0, _LINK_COLLISION_SAMPLES, endpoint=True)[1:]:
             points.append((1.0 - alpha) * start + alpha * end)
     return points
+
+
+def camera_box_clearance(q, stride=1):
+    """Return minimum signed XY clearance from sampled robot body points to camera boxes.
+
+    Positive means the point is outside the XY rectangle, zero is on a box edge,
+    and negative means the point projection is inside the XY rectangle.
+    """
+    model, data = _get_pin_model_data()
+    stride = max(1, int(stride))
+    min_clearance = np.inf
+
+    for q_i in q[::stride]:
+        pin.forwardKinematics(model, data, q_i)
+        pin.updateFramePlacements(model, data)
+        body_points = np.array(_sample_robot_body_points(model, data))
+        if body_points.size == 0:
+            continue
+
+        delta = (
+            np.abs(
+                body_points[:, None, :2]
+                - _CAMERA_SAFETY_BOX_CENTERS_M[None, :, :2]
+            )
+            - _CAMERA_SAFETY_BOX_HALF_SIZES_M[None, :, :2]
+        )
+        outside_delta = np.maximum(delta, 0.0)
+        signed_distance = np.linalg.norm(outside_delta, axis=2) + np.minimum(
+            np.max(delta, axis=2),
+            0.0,
+        )
+        min_clearance = min(min_clearance, float(np.min(signed_distance)))
+
+    return min_clearance
 
 
 def test_traj(q, dq, _ddq):

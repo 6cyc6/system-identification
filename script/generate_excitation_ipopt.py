@@ -62,7 +62,7 @@ def main():
     )
     parser.add_argument("--objective_lambda", type=float, default=1e-6)
     parser.add_argument("--eig_eps", type=float, default=1e-9)
-    parser.add_argument("--ipopt_max_iter", type=int, default=300)
+    parser.add_argument("--ipopt_max_iter", type=int, default=500)
     parser.add_argument("--ipopt_print_level", type=int, default=5)
     parser.add_argument(
         "--ipopt_hessian_approximation",
