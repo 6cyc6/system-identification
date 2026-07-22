@@ -1,8 +1,11 @@
+import copy
+
 import numpy as np
 
 from loguru import logger
 
 from .excitation_generator import is_traj_valid
+from ..model.workspace_constraints import robot_link_workspace_margins
 from ..utils.fourier_utils import flat_params_to_traj, unflatten_fourier_params
 
 
@@ -117,3 +120,83 @@ def validate_trajectory(
         "drake_clearance": drake_clearance,
         "link_wall_margin": link_wall_margin,
     }
+
+
+def validate_fr3_trajectory(
+    label,
+    flat_params,
+    fourier_config,
+    robot_config,
+    collision_checker,
+    config,
+):
+    """Validate a trajectory with FR3 x/y/z walls and self-collision margins."""
+    # The base validator owns Fourier, joint-limit, and camera-box checks. Its
+    # simpler wall model is disabled and replaced with the sphere-aware model.
+    base_config = copy.copy(config)
+    base_config.disable_link_y_bounds = True
+    result = validate_trajectory(
+        label,
+        flat_params,
+        fourier_config,
+        robot_config,
+        collision_checker,
+        base_config,
+    )
+
+    validation_stride = max(1, int(config.validation_stride))
+    q_sampled = result["q"][::validation_stride]
+    workspace_margin = np.inf
+    workspace_report = {}
+    if not config.disable_link_y_bounds:
+        workspace_margins = robot_link_workspace_margins(
+            collision_checker,
+            q_sampled,
+            x_lower=config.link_x_lower,
+            y_lower=config.link_y_lower,
+            y_upper=config.link_y_upper,
+            z_lower=config.link_z_lower,
+        )
+        workspace_margin = float(np.min(workspace_margins))
+        workspace_report = {
+            "link_wall_margin": workspace_margin,
+            "min_x_lower_margin": float(np.min(workspace_margins[:, 0])),
+            "min_y_lower_margin": float(np.min(workspace_margins[:, 1])),
+            "min_y_upper_margin": float(np.min(workspace_margins[:, 2])),
+            "min_z_margin": float(np.min(workspace_margins[:, 3])),
+        }
+
+    self_collision_margin = np.inf
+    if not config.disable_self_collision_constraints:
+        self_collision_margin = float(
+            np.min(
+                collision_checker.robot_self_collision_pair_margins(q_sampled)
+                - float(config.self_collision_clearance)
+            )
+        )
+
+    result.update(
+        {
+            "valid": bool(
+                result["valid"]
+                and workspace_margin >= 0.0
+                and self_collision_margin >= 0.0
+            ),
+            "self_collision_margin": self_collision_margin,
+            **workspace_report,
+        }
+    )
+    if not config.disable_link_y_bounds:
+        logger.info(
+            f"{label} sampled workspace margins: "
+            f"x_lower={result['min_x_lower_margin']}; "
+            f"y_lower={result['min_y_lower_margin']}; "
+            f"y_upper={result['min_y_upper_margin']}; "
+            f"z_lower={result['min_z_margin']}"
+        )
+    if not config.disable_self_collision_constraints:
+        logger.info(
+            f"{label} sampled self-collision margin: "
+            f"{result['self_collision_margin']}"
+        )
+    return result

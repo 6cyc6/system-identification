@@ -5,7 +5,8 @@ import pinocchio as pin
 
 from scipy.interpolate import UnivariateSpline as US
 from scipy.stats import truncnorm
-from ..utils.utils import find_path
+
+from ..utils.path_utils import find_path
 
 
 @lru_cache(maxsize=None)
@@ -496,7 +497,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # setup gym env
-    from ..utils.utils import retrieve_robot_config
+    from ..utils.robot_config import retrieve_robot_config
 
     robot_config = retrieve_robot_config(args.robot)
     njoints = robot_config["njoints"]
@@ -519,7 +520,7 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
 
-    from ..utils.utils import vis_compare_seqs
+    from ..utils.visualization import vis_compare_seqs
 
     vis_compare_seqs([t, t, t], [qs, qds, qdds], ["q", "qd", "qdd"], ["time"])
     print(t.shape, qs.shape, qds.shape, qdds.shape, init_params.shape)

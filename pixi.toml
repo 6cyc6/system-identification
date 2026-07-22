@@ -5,8 +5,8 @@ description = "System identification experiments and MuJoCo trajectory playback"
 channels = ["conda-forge"]
 platforms = ["linux-64"]
 
-[activation.env]
-MPLCONFIGDIR = ".pixi/matplotlib"
+[activation]
+scripts = ["env.sh"]
 
 [dependencies]
 python = ">=3.10,<3.12"
@@ -61,7 +61,7 @@ casadi = ">=3.7.2,<4"
 [pypi-dependencies]
 system-identification = { path = ".", editable = true }
 gnupg = "==2.3.1"
-drake = { path = "/home/galois/.cache/pypoetry/artifacts/07/c7/ab/61ab8afd355a837d9344f91e06e41ce1ec90eab7d69f27842b63f4c92a/drake-0.0.20260216-cp310-cp310-manylinux_2_34_x86_64.whl" }
+drake = { url = "https://files.pythonhosted.org/packages/0f/c9/c957a97313b3e12ade95c343e16aed9afdc26fb99b0bcf5b165cd348f4d7/drake-1.50.0-cp310-cp310-manylinux_2_34_x86_64.whl" }
 
 [tasks]
 run-trajectory = "python script/run_trajectory.py"

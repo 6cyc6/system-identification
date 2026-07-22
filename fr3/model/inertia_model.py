@@ -5,8 +5,19 @@ from os import system
 import numpy as np
 import pinocchio as pin
 
+from loguru import logger
 from scipy.linalg import block_diag
-from ..utils.utils import *
+
+from ..utils.inertia import (
+    I,
+    inertiaVecToIcQs,
+    inertiaVecToPinertia,
+    inertiaVecToQ,
+    retrieve_geo_fromCAD,
+    skew_symmetric,
+)
+from ..utils.io_utils import load_yaml
+from ..utils.path_utils import find_path
 
 # This System identification algorithm is based on the original paper by:
 #

@@ -22,7 +22,8 @@ setup(
     license='MIT',
     packages=[package for package in find_packages()
               if package.startswith('system_identification')
-              or package.startswith('twinskill')],
+              or package.startswith('twinskill')
+              or package.startswith('fr3')],
     zip_safe=False,
     install_requires=requires_list,
     extras_require={},

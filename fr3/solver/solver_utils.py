@@ -2,7 +2,7 @@ import numpy as np
 import scipy.linalg
 
 from ..utils.fourier_utils import flat_params_to_traj
-from ..utils.utils import feature2regressor
+from ..utils.regression import feature2regressor
 
 
 def generateSymFrictionReg(dq, vbrk=0.001):

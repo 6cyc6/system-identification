@@ -368,7 +368,6 @@
     <mimic joint="panda_finger_joint1"/>
     <dynamics damping="0.3"/>
   </joint>
-  </link>
 
 
   <!-- MATERIALS -->

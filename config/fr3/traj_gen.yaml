@@ -1,0 +1,68 @@
+# Robot and output
+robot: fr3
+robot_urdf_path: robot_description/fr3_description/fr3_gripper.urdf
+save_dir: logs/fr3_excitation
+run_name: null
+
+# Reproducible random search for the feasible IPOPT initial guess
+seed: 40
+max_initial_attempts: 5000
+
+# Fourier trajectory definition
+fourier_order: 5
+fourier_duration: 10.0
+
+# System-identification objective
+excite_type: cond
+friction_model: symmetric
+objective_lambda: 0.000001
+eig_eps: 0.000001
+no_identifiable_column_reduction: false
+
+# Fourier safety envelopes used inside IPOPT
+fourier_velocity_limit_scale: 0.9
+fourier_position_limit_scale: 0.92
+early_stop_constraint_tol: 0.000001
+
+# IPOPT
+ipopt_max_iter: 1000
+ipopt_print_level: 5
+ipopt_hessian_approximation: limited-memory
+log_condition_every: 5
+
+# Intermediate best-candidate filtering
+best_condition_check_every: 3
+initial_best_condition_number: 10000000.0
+best_condition_fourier_velocity_margin_tolerance: 0.0
+best_condition_fourier_position_margin_tolerance: 0.0
+best_condition_fourier_velocity_margin_min: -0.01
+best_condition_fourier_position_margin_min: -0.001
+
+# Collision and validation sampling
+camera_collision_stride: 3
+validation_stride: 1
+drake_min_distance: 0.02
+drake_robot_sphere_radius: 0.05
+drake_robot_link_samples: 5
+drake_camera_chamfer_radius: 0.015
+
+# Camera keep-out boxes. Set drake_xy_prism_height to a number to replace each
+# measured box height with a vertical-prism height before applying the z scale.
+drake_xy_prism_height: null
+drake_physical_camera_height: false
+camera_box_xy_scale: 1.1
+camera_box_z_scale: 1.1
+
+# Robot-link workspace and self-collision margins (meters)
+link_y_lower: -0.4
+link_y_upper: 0.4
+link_x_lower: -0.2
+link_z_lower: 0.1
+disable_self_collision_constraints: false
+self_collision_clearance: 0.0
+disable_link_y_bounds: false
+
+# Execution modes
+initial_only: false
+no_save: false
+plot: false

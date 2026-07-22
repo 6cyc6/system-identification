@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug FR3 excitation trajectory (Pixi)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "${workspaceFolder}/.pixi/envs/default/bin/python",
+            "program": "${workspaceFolder}/script/fr3/generate_excitation_trajectory.py",
+            "args": [
+                "--config",
+                "${workspaceFolder}/config/fr3/traj_gen.yaml"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "BASE_DIR": "${workspaceFolder}",
+                "ISAAC_OBJ_DIR": "/home/ikun/assets/Assets/Isaac/4.5/Isaac",
+                "YCB_DIR": "/home/ikun/assets/assets/obj/YCB/Axis_Aligned_Physics",
+                "SAVE_DIR": "/home/ikun/temp",
+                "ASSETS_DIR": "/home/ikun/assets/assets",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PATH": "${workspaceFolder}/.pixi/envs/default/bin:${workspaceFolder}/bin:${env:PATH}"
+            }
+        }
+    ]
+}
