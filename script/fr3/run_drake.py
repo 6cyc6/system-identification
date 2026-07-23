@@ -31,7 +31,7 @@ PROJECT_ROOT = SCRIPT_DIR.parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from fr3.model.collision_model import (
+from sysid.model.collision_model import (
     CAMERA_BOX_HEIGHT_SCALE,
     CAMERA_BOX_MARGIN_SCALE,
     CAMERA_BOX_SPECS_MM,

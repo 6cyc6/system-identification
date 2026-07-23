@@ -25,7 +25,7 @@ import yaml
 
 from loguru import logger
 
-from fr3.traj_generator.artifacts import (
+from sysid.traj_generator.artifacts import (
     BestCandidateRecorder,
     make_trajectory_record,
     save_robot_payload_fourier_format,
@@ -33,9 +33,9 @@ from fr3.traj_generator.artifacts import (
     select_best_valid_record,
     yaml_safe,
 )
-from fr3.traj_generator.config import Fr3ExcitationConfig
-from fr3.utils.path_utils import BASE_DIR, get_config_path, resolve_repo_path
-from fr3.utils.robot_config import retrieve_robot_config
+from sysid.traj_generator.config import Fr3ExcitationConfig
+from sysid.utils.path_utils import BASE_DIR, get_config_path, resolve_repo_path
+from sysid.utils.robot_config import retrieve_robot_config
 
 
 # BASE_DIR comes from env.sh, so the default does not depend on the current
@@ -101,19 +101,19 @@ def main():
     ############################################################################
     # These imports happen only after parsing so --help and configuration errors
     # do not need Drake, Pinocchio, IPOPT, or Matplotlib.
-    from fr3.model.collision_model import DEFAULT_FR3_SELF_COLLISION_BODY_PAIRS
-    from fr3.model.inertia_model import InertiaModel
-    from fr3.model.workspace_constraints import build_collision_checker
-    from fr3.solver.solver_utils import evaluate_params_metrics
-    from fr3.solver.wall_bound_solver import (
+    from sysid.model.collision_model import DEFAULT_FR3_SELF_COLLISION_BODY_PAIRS
+    from sysid.model.inertia_model import InertiaModel
+    from sysid.model.workspace_constraints import build_collision_checker
+    from sysid.solver.solver_utils import evaluate_params_metrics
+    from sysid.solver.wall_bound_solver import (
         WallBoundDrakeMathematicalProgramExcitationSolver,
     )
-    from fr3.traj_generator.initialization import generate_valid_initial_trajectory
-    from fr3.traj_generator.validation import validate_fr3_trajectory
+    from sysid.traj_generator.initialization import generate_valid_initial_trajectory
+    from sysid.traj_generator.validation import validate_fr3_trajectory
 
     if config.plot:
         # Matplotlib is optional for headless trajectory generation.
-        from fr3.utils.visualization import vis_compare_seqs
+        from sysid.utils.visualization import vis_compare_seqs
 
     if not config.no_save:
         # Save the exact input settings before generating data so every result
