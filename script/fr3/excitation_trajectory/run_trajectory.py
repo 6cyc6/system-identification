@@ -550,7 +550,7 @@ def report_robot_self_collision(
     )
     if best_margin < float(clearance):
         logger.warning(
-            "Possible Franka self-collision under saved-sphere approximation: "
+            "Possible Franka self-collision under saved-sphere proxy: "
             f"margin {best_margin} < {clearance}."
         )
     else:

@@ -1,0 +1,38 @@
+# Robot and output
+robot: fr3
+# Set to null to resolve the preferred URDF from the robot name.
+urdf: null
+# "all" writes sphere, capsule, and inertial-ellipsoid proxy files.
+mode: all
+# Set to null to use robot_description/{robot}_description/collisions.
+output_dir: null
+
+# Proxy quality
+max_spheres: 3
+max_capsules: 1
+margin: 0.002
+voxel_divisions: 100
+precision: 0.95
+# A group is elongated when its longest inertial-ellipsoid axis is at
+# least this many times longer than its second-longest axis.
+elongation_threshold: 2.0
+
+# Optional collision-link groups, expressed in the anchor-link frame.
+# Example:
+# group_overrides:
+#   fr3_hand:
+#     - fr3_hand
+#     - fr3_leftfinger
+#     - fr3_rightfinger
+group_overrides: {}
+
+# Optional reference joint positions used for grouped-link transforms.
+# Example:
+# joint_position_overrides:
+#   fr3_finger_joint1: 0.04
+joint_position_overrides: {}
+
+# Meshcat viewer
+initial_view: spheres
+proxy_opacity: 0.1
+hold: true

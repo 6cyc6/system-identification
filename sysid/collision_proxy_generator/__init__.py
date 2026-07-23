@@ -1,6 +1,11 @@
-"""Robot-model construction tools."""
+"""Collision-proxy generation, persistence, and visualization."""
 
-from sysid.collision_proxy_generator import (
+from .collision_proxy_generator import (
+    CAPSULE_FILENAME,
+    DEFAULT_CONFIG_PATH,
+    ELLIPSOID_FILENAME,
+    ROBOT_DESCRIPTION_DIR,
+    SPHERE_FILENAME,
     CapsuleProxy,
     CollisionProxyConfig,
     CollisionProxyResult,
@@ -8,16 +13,23 @@ from sysid.collision_proxy_generator import (
     GeneratorConfig,
     LinkProxy,
     SphereProxy,
+    default_output_dir,
     generate_collision_proxies,
     generate_configured_collision_proxies,
     load_collision_model,
     load_collision_proxies,
+    resolve_robot_urdf,
     save_collision_proxies,
     visualize_collision_model,
     visualize_collision_proxies,
 )
 
 __all__ = [
+    "CAPSULE_FILENAME",
+    "DEFAULT_CONFIG_PATH",
+    "ELLIPSOID_FILENAME",
+    "ROBOT_DESCRIPTION_DIR",
+    "SPHERE_FILENAME",
     "CapsuleProxy",
     "CollisionProxyConfig",
     "CollisionProxyResult",
@@ -25,10 +37,12 @@ __all__ = [
     "GeneratorConfig",
     "LinkProxy",
     "SphereProxy",
+    "default_output_dir",
     "generate_collision_proxies",
     "generate_configured_collision_proxies",
     "load_collision_model",
     "load_collision_proxies",
+    "resolve_robot_urdf",
     "save_collision_proxies",
     "visualize_collision_model",
     "visualize_collision_proxies",
