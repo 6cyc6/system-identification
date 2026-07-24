@@ -3,8 +3,8 @@
 import numpy as np
 import scipy.linalg
 
-from .io_utils import merge_dict
-from .robot_config import _load_pin_model_for_robot
+from ..utils.io_utils import merge_dict
+from ..utils.robot_config import _load_pin_model_for_robot
 
 
 def retrieve_geo_fromCAD(robot_name="fr3"):

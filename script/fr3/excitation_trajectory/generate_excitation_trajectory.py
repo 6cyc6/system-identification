@@ -113,7 +113,7 @@ def main():
 
     if config.plot:
         # Matplotlib is optional for headless trajectory generation.
-        from sysid.utils.visualization import vis_compare_seqs
+        from sysid.traj_generator.visualization import vis_compare_seqs
 
     if not config.no_save:
         # Save the exact input settings before generating data so every result

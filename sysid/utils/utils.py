@@ -6,8 +6,8 @@ re-exports keep older scripts working while callers migrate their imports.
 
 from .config_utils import DataClass
 from .dataset import Dataset
-from .dynamics import dynamics_prediction, load_model_params
-from .inertia import (
+from ..model.dynamics import dynamics_prediction, load_model_params
+from ..model.inertia import (
     I,
     bregman_i,
     bregman_regularizer,
@@ -38,7 +38,7 @@ from .path_utils import (
     get_config_path,
     resolve_repo_path,
 )
-from .regression import (
+from ..solver.regression import (
     QR_dim_reduction,
     QR_dim_reduction_backup,
     SVD_dim_reduction,
@@ -56,7 +56,7 @@ from .robot_config import (
 )
 from .signal_processing import check_jumps, perturbed_array, savitzy_filter
 from .string_utils import concanate_strings, concatenate_strings
-from .visualization import draw_spectrum, vis_compare_seqs
+from ..traj_generator.visualization import draw_spectrum, vis_compare_seqs
 
 # Historical name retained for callers that used it directly.
 FR3_ROOT = BASE_DIR

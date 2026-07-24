@@ -62,7 +62,6 @@ casadi = ">=3.7.2,<4"
 system-identification = { path = ".", editable = true }
 gnupg = "==2.3.1"
 drake = { url = "https://files.pythonhosted.org/packages/0f/c9/c957a97313b3e12ade95c343e16aed9afdc26fb99b0bcf5b165cd348f4d7/drake-1.50.0-cp310-cp310-manylinux_2_34_x86_64.whl" }
-multisphere = ">=1.1, <2"
 trimesh = ">=4.12, <5"
 
 [tasks]

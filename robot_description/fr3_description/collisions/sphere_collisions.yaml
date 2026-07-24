@@ -1,12 +1,14 @@
-schema_version: 1
+schema_version: 2
 kind: spheres
 robot: fr3
 source_urdf: robot_description/fr3_description/urdf/fr3_gripper.urdf
 units: m
 parameters:
-  max_spheres_per_group: 3
+  max_spheres_per_group: 6
   max_capsules_per_group: 1
-  margin: 0.002
+  margin: 0.001
+  max_sphere_overhang: 0.06
+  sphere_surface_subdivisions: 2
   voxel_divisions: 100
   precision: 0.95
   elongation_threshold: 2.0
@@ -30,95 +32,166 @@ groups:
   - panda_link0
   primitives:
   - center:
-    - -0.043308654799161114
-    - 1.0207870704784239e-05
-    - 0.057920440820974625
-    radius: 0.13005602819125128
+    - -0.07211900314987321
+    - -2.6895107723218237e-05
+    - 0.04787224322065985
+    radius: 0.10471511959269299
+  - center:
+    - -0.00302053302627861
+    - -2.7121297764817753e-05
+    - 0.049993334462592694
+    radius: 0.1081161526110396
+  fit:
+    max_overhang: 0.05810357557367609
+    p95_overhang: 0.05291047582324535
+    mean_overhang: 0.030259238715713965
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 214
 - name: panda_link1
   frame: panda_link1
   source_links:
   - panda_link1
   primitives:
   - center:
-    - 0.00020099612992505124
-    - -0.014251747311801677
-    - -0.006808348861950871
-    radius: 0.11757957568927918
+    - -0.0004760403595615234
+    - -0.04840128303442032
+    - -0.02059717377031277
+    radius: 0.09060742879384028
   - center:
-    - -0.0005870843976679206
-    - -0.02947005765204121
-    - -0.13173007559241223
-    radius: 0.11088948493522323
+    - 4.144095277797133e-06
+    - -0.0091361329115026
+    - -0.12855784576429766
+    radius: 0.09135025245720203
+  fit:
+    max_overhang: 0.03641707536709047
+    p95_overhang: 0.03295969107114261
+    mean_overhang: 0.020000563669809807
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 263
 - name: panda_link2
   frame: panda_link2
   source_links:
   - panda_link2
   primitives:
   - center:
-    - -0.004785143581860808
-    - -0.08228992636674351
-    - 0.03859504163882034
-    radius: 0.14787586385704093
+    - 9.653729896590135e-05
+    - -0.1299734509408929
+    - 0.0091086617098316
+    radius: 0.09167382434873565
+  - center:
+    - 0.0005864301749481729
+    - -0.020951017616533327
+    - 0.04819589575884668
+    radius: 0.09092719413766713
+  fit:
+    max_overhang: 0.0368422842992995
+    p95_overhang: 0.03280593431669922
+    mean_overhang: 0.01984528979503909
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 270
 - name: panda_link3
   frame: panda_link3
   source_links:
   - panda_link3
   primitives:
   - center:
-    - 0.03226998736482001
-    - 0.02654744700262124
-    - -0.038193294541966974
-    radius: 0.1294382098780687
+    - 0.00964653835433367
+    - 0.0033943877645716616
+    - -0.07240288048431341
+    radius: 0.08244352529154356
+  - center:
+    - 0.07116897001561498
+    - 0.03880335498410581
+    - -0.012415675772819268
+    radius: 0.08402134774374781
+  fit:
+    max_overhang: 0.03384638464429815
+    p95_overhang: 0.028148896551784854
+    mean_overhang: 0.016811733976963828
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 253
 - name: panda_link4
   frame: panda_link4
   source_links:
   - panda_link4
   primitives:
   - center:
-    - -0.040892384002710516
-    - 0.04940596200910301
-    - 0.026577549649722962
-    radius: 0.13024203907606394
+    - -0.07310631913987366
+    - 0.07414309009411489
+    - 0.003507338343662264
+    radius: 0.08300946678806684
+  - center:
+    - -0.011934847145109756
+    - 0.012659442970739954
+    - 0.038649420297522816
+    radius: 0.08459954993827377
+  fit:
+    max_overhang: 0.033153289046023424
+    p95_overhang: 0.028207840855748872
+    mean_overhang: 0.016966896776066952
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 253
 - name: panda_link5
   frame: panda_link5
   source_links:
   - panda_link5
   primitives:
   - center:
-    - -0.0019125583576085417
-    - 0.01718240835674735
-    - -0.10137639568215145
-    radius: 0.17544446928250404
+    - -5.7052623905901045e-05
+    - 0.018779053511100652
+    - -0.18576003229665455
+    radius: 0.105061842743202
+  - center:
+    - 0.00013390627521930876
+    - 0.05985221679924081
+    - -0.03864620307454206
+    radius: 0.09954105385737111
+  fit:
+    max_overhang: 0.051576898315012255
+    p95_overhang: 0.047316731371948494
+    mean_overhang: 0.029218266127744513
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 287
 - name: panda_link6
   frame: panda_link6
   source_links:
   - panda_link6
   primitives:
   - center:
-    - -0.006796611696013435
-    - -0.005973080769192549
-    - -0.0002269909585527908
-    radius: 0.134912140505922
-  - center:
-    - 0.07658522288108842
-    - -0.04992252391657508
-    - -0.012691417379032564
-    radius: 0.134912140505922
+    - 0.04836849788561991
+    - 0.00027872006815285455
+    - 0.005082579831992083
+    radius: 0.09945281926787247
+  fit:
+    max_overhang: 0.058112831326907824
+    p95_overhang: 0.05059976796892293
+    mean_overhang: 0.029085561474501052
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 162
 - name: panda_link7
   frame: panda_link7
   source_links:
   - panda_link7
   primitives:
   - center:
-    - -0.020419393411486835
-    - -0.039117353686099365
-    - 0.07333305257614253
-    radius: 0.10280194032037065
-  - center:
-    - -0.01007188387988623
-    - -0.01931030982185643
-    - 0.03620429204662358
-    radius: 0.12650562434551754
+    - 0.013357748352340514
+    - 0.013332975199574333
+    - 0.08744946075615526
+    radius: 0.07391154175565348
+  fit:
+    max_overhang: 0.05456153762122637
+    p95_overhang: 0.04743423260532233
+    mean_overhang: 0.026066131963656706
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 162
 - name: panda_hand
   frame: panda_hand
   source_links:
@@ -127,12 +200,34 @@ groups:
   - panda_rightfinger
   primitives:
   - center:
-    - -1.9918033609376463e-05
-    - -0.05176331387234083
-    - 0.038083224485636474
-    radius: 0.17550429123195108
+    - -3.3097140873655784e-06
+    - -0.05665901262228927
+    - 0.13135250405203552
+    radius: 0.05280804264768392
   - center:
-    - -2.5743466584391926e-05
-    - 0.049062104546317306
-    - 0.032859119990924786
-    radius: 0.18056424180579755
+    - -3.95596950838132e-05
+    - -0.04615646305330934
+    - 0.19456010689264605
+    radius: 0.022419857727084536
+  - center:
+    - -4.032539356733922e-06
+    - 0.05629765296009172
+    - 0.1546599665652846
+    radius: 0.06062377289447498
+  - center:
+    - 4.656437305551597e-06
+    - -0.047473483290037165
+    - 0.02997982206273199
+    radius: 0.0711711063580546
+  - center:
+    - 4.480071292271848e-06
+    - 0.03654378621772857
+    - 0.046333354913152464
+    radius: 0.07516817100432223
+  fit:
+    max_overhang: 0.0544172732886033
+    p95_overhang: 0.0454419122427206
+    mean_overhang: 0.024644064015656147
+    tolerance: 0.06
+    tolerance_met: true
+    surface_samples: 650

@@ -1,4 +1,4 @@
-"""Linear-algebra and regressor construction helpers."""
+"""Solver-owned linear-algebra and regressor construction helpers."""
 
 from copy import copy
 

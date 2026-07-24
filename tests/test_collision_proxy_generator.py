@@ -20,12 +20,15 @@ from sysid.collision_proxy_generator import (
     save_collision_proxies,
     visualize_collision_proxies,
 )
-from sysid.collision_proxy_generator.collision_proxy_generator import (
+from sysid.collision_proxy_generator.meshcat_visualizer import (
     _add_joint_sliders,
     _joint_slider_specs,
     _read_joint_sliders,
-    _read_robot_geometry,
+    _set_body_view,
     _update_meshcat_transforms,
+)
+from sysid.collision_proxy_generator.urdf_geometry import (
+    _read_robot_geometry,
 )
 
 
@@ -172,6 +175,14 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
         self.assertEqual(config.mode, document["mode"])
         self.assertEqual(config.max_spheres, document["max_spheres"])
         self.assertEqual(config.max_capsules, document["max_capsules"])
+        self.assertEqual(
+            config.max_sphere_overhang,
+            document["max_sphere_overhang"],
+        )
+        self.assertEqual(
+            config.sphere_surface_subdivisions,
+            document["sphere_surface_subdivisions"],
+        )
         self.assertEqual(config.group_overrides, {})
         self.assertEqual(config.joint_position_overrides, {})
         self.assertEqual(config.proxy_opacity, document["proxy_opacity"])
@@ -246,8 +257,15 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
         self.assertEqual(loaded.robot, result.robot)
         self.assertEqual(loaded.groups, result.groups)
         document = yaml.safe_load(first_spheres)
-        self.assertEqual(document["schema_version"], 1)
+        self.assertEqual(document["schema_version"], 2)
         self.assertEqual(document["units"], "m")
+        for group in document["groups"]:
+            self.assertIn("fit", group)
+            self.assertEqual(
+                group["fit"]["tolerance_met"],
+                group["fit"]["max_overhang"]
+                <= group["fit"]["tolerance"] + 1e-12,
+            )
 
     def test_visualizer_loads_saved_collision_model(self) -> None:
         result = self._generate()
@@ -311,6 +329,12 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
     def test_generated_primitives_contain_base_box_triangles(self) -> None:
         result = self._generate()
         base = result.groups[0]
+        ellipsoid = base.ellipsoids[0]
+        np.testing.assert_allclose(
+            ellipsoid.center,
+            (0.01, 0.0, 0.0),
+            atol=1e-12,
+        )
         vertices = np.array(
             [
                 [x + 0.01, y, z]
@@ -338,7 +362,6 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
                     for capsule in base.capsules
                 )
             )
-            ellipsoid = base.ellipsoids[0]
             local_vertex = (
                 vertex - np.asarray(ellipsoid.center)
             ) @ np.asarray(ellipsoid.rotation)
@@ -348,6 +371,45 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
                 ),
                 1.0 + 1e-9,
             )
+
+    def test_ellipsoid_fit_is_independent_of_urdf_inertia(self) -> None:
+        first_path = self.root / "first_inertia.urdf"
+        first_path.write_text(ELONGATED_URDF, encoding="utf-8")
+        changed_inertia = ELONGATED_URDF.replace(
+            '<origin xyz="0 0 0"/>',
+            '<origin xyz="4 -3 2"/>',
+        ).replace(
+            'ixx="0.0002666666666666667"',
+            'ixx="0.013466666666666667"',
+        ).replace(
+            'iyy="0.013466666666666667"',
+            'iyy="0.0002666666666666667"',
+        )
+        second_path = self.root / "second_inertia.urdf"
+        second_path.write_text(changed_inertia, encoding="utf-8")
+        config = GeneratorConfig(
+            max_spheres=1,
+            max_capsules=1,
+            margin=0.001,
+        )
+
+        first = generate_collision_proxies(
+            "elongated_robot",
+            urdf_path=first_path,
+            config=config,
+            mode="ellipsoids",
+        )
+        second = generate_collision_proxies(
+            "elongated_robot",
+            urdf_path=second_path,
+            config=config,
+            mode="ellipsoids",
+        )
+
+        self.assertEqual(
+            first.groups[0].ellipsoids,
+            second.groups[0].ellipsoids,
+        )
 
     def test_meshcat_scene_contains_source_and_all_proxy_types(self) -> None:
         result = self._generate()
@@ -420,7 +482,26 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
                     meshcat.properties[(path, "transparent")]
                 )
 
-    def test_elongated_inertia_uses_skeleton_and_one_capsule(self) -> None:
+        _set_body_view(meshcat, result, "tool_hand")
+        self.assertFalse(
+            meshcat.properties[
+                ("/collision_proxy/bodies/base", "visible")
+            ]
+        )
+        self.assertTrue(
+            meshcat.properties[
+                ("/collision_proxy/bodies/tool_hand", "visible")
+            ]
+        )
+        _set_body_view(meshcat, result, None)
+        for body in ("base", "tool_hand"):
+            self.assertTrue(
+                meshcat.properties[
+                    (f"/collision_proxy/bodies/{body}", "visible")
+                ]
+            )
+
+    def test_progressive_spheres_stop_at_first_feasible_count(self) -> None:
         elongated_path = self.root / "elongated_robot.urdf"
         elongated_path.write_text(ELONGATED_URDF, encoding="utf-8")
         result = generate_collision_proxies(
@@ -443,8 +524,10 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
         self.assertTrue(ellipsoid.elongated)
         self.assertGreaterEqual(ellipsoid.axis_ratio, 2.0)
         self.assertEqual(len(group.capsules), 1)
-        self.assertGreater(len(group.spheres), 1)
-        self.assertLessEqual(len(group.spheres), 5)
+        self.assertEqual(len(group.spheres), 4)
+        self.assertIsNotNone(group.sphere_fit)
+        self.assertTrue(group.sphere_fit.tolerance_met)
+        self.assertLessEqual(group.sphere_fit.max_overhang, 0.05)
 
         center = np.asarray(ellipsoid.center)
         major_axis = np.asarray(ellipsoid.rotation)[:, 0]
@@ -459,6 +542,21 @@ class CollisionProxyGeneratorTest(unittest.TestCase):
         )
         capsule_axis /= np.linalg.norm(capsule_axis)
         self.assertGreater(abs(float(capsule_axis @ major_axis)), 1.0 - 1e-10)
+
+        one_sphere = generate_collision_proxies(
+            "elongated_robot",
+            urdf_path=elongated_path,
+            config=GeneratorConfig(
+                max_spheres=5,
+                max_capsules=1,
+                margin=0.001,
+                max_sphere_overhang=0.2,
+                sphere_surface_subdivisions=2,
+            ),
+            mode="spheres",
+        ).groups[0]
+        self.assertEqual(len(one_sphere.spheres), 1)
+        self.assertTrue(one_sphere.sphere_fit.tolerance_met)
 
 
 def _point_segment_distance(

@@ -1,4 +1,4 @@
-"""Rigid-body dynamics model composition helpers."""
+"""Model-owned rigid-body dynamics composition helpers."""
 
 
 def dynamics_prediction(models, q, dq, ddq, des_pos=None, des_vel=None, des_acc=None):

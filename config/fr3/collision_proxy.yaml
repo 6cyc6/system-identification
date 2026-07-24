@@ -2,18 +2,23 @@
 robot: fr3
 # Set to null to resolve the preferred URDF from the robot name.
 urdf: null
-# "all" writes sphere, capsule, and inertial-ellipsoid proxy files.
+# "all" writes sphere, capsule, and mesh-ellipsoid proxy files.
 mode: all
 # Set to null to use robot_description/{robot}_description/collisions.
 output_dir: null
 
 # Proxy quality
-max_spheres: 3
+max_spheres: 6
 max_capsules: 1
-margin: 0.002
+margin: 0.001
+# Start with one enclosing sphere and split until the maximum exposed-union
+# overhang is at most this distance, or the sphere budget is exhausted.
+max_sphere_overhang: 0.06
+# An icosphere at this subdivision level samples the exposed union surface.
+sphere_surface_subdivisions: 2
 voxel_divisions: 100
 precision: 0.95
-# A group is elongated when its longest inertial-ellipsoid axis is at
+# A group is elongated when its longest enclosing mesh-ellipsoid axis is at
 # least this many times longer than its second-longest axis.
 elongation_threshold: 2.0
 

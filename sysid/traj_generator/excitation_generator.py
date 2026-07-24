@@ -520,7 +520,7 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
 
-    from ..utils.visualization import vis_compare_seqs
+    from .visualization import vis_compare_seqs
 
     vis_compare_seqs([t, t, t], [qs, qds, qdds], ["q", "qd", "qdd"], ["time"])
     print(t.shape, qs.shape, qds.shape, qdds.shape, init_params.shape)

@@ -8,7 +8,7 @@ import pinocchio as pin
 from loguru import logger
 from scipy.linalg import block_diag
 
-from ..utils.inertia import (
+from .inertia import (
     I,
     inertiaVecToIcQs,
     inertiaVecToPinertia,

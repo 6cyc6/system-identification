@@ -20,8 +20,8 @@ from sysid.utils.path_utils import BASE_DIR
 def build_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Generate conservative sphere, capsule, and ellipsoid collision "
-            "proxies from a robot URDF and save YAML manifests."
+            "Generate conservative sphere, capsule, and mesh-ellipsoid "
+            "collision proxies from a robot URDF and save YAML manifests."
         )
     )
     parser.add_argument(

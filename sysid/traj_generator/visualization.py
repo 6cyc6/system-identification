@@ -1,4 +1,4 @@
-"""Plotting helpers for trajectories and sampled signals."""
+"""Trajectory-generator plotting helpers."""
 
 import matplotlib.pyplot as plt
 import numpy as np
